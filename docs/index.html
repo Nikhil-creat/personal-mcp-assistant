@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal MCP Assistant · Agentic AI over your calendar, notes & documents</title>
+<meta name="description" content="Groq-powered MCP agent with hybrid RAG, CNN/OCR vision and a 3D context graph. Designed and developed by Nikhil Chary Sriramoju.">
+<meta name="author" content="Nikhil Chary Sriramoju">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="nav" id="top">
+  <a class="brand" href="#top"><span class="logo">◈</span> MCP<span class="dim">Assistant</span></a>
+  <nav id="menu">
+    <a href="#features">Features</a><a href="#assistant">Assistant</a><a href="#architecture">Architecture</a>
+    <a href="#stack">Stack</a><a href="#deploy">Deploy</a><a href="#faq">FAQ</a>
+  </nav>
+  <div class="nav-actions">
+    <span class="badge" id="modeBadge">offline mode</span>
+    <button class="btn ghost" id="openSettings" aria-label="Settings">⚙ Settings</button>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <canvas id="hero3d" aria-label="Interactive 3D context graph"></canvas>
+  <div class="hero-copy reveal">
+    <p class="eyebrow">Model Context Protocol · Groq LPU · Hybrid RAG · CNN Vision</p>
+    <h1>Your calendar, notes & whiteboards — <span class="grad">one agentic brain.</span></h1>
+    <p class="lead">A ReAct agent that searches your knowledge with dense + lexical retrieval, reads scanned images through a CNN/OCR pipeline, manages your schedule via MCP tools, and fact-checks itself before it answers.</p>
+    <div class="cta">
+      <a class="btn primary" href="#assistant">Launch assistant</a>
+      <button class="btn ghost" id="seedBtn">Load demo data</button>
+      <a class="btn ghost" href="#deploy">Self-host with Docker</a>
+    </div>
+    <p class="hint">Runs 100% in your browser. Your data and Groq key never leave your device (stored in localStorage).</p>
+  </div>
+</section>
+
+<section class="stats reveal">
+  <div><b>12</b><span>MCP tools</span></div><div><b>RRF</b><span>dense + sparse fusion</span></div>
+  <div><b>&lt;1s</b><span>Groq LPU inference</span></div><div><b>2</b><span>modes: browser & Docker</span></div>
+</section>
+
+<section id="features" class="sec">
+  <h2 class="reveal">What it does</h2>
+  <div class="grid cards">
+    <article class="card reveal"><i>🛠</i><h3>MCP tool server</h3><p>Calendar, notes, vision, memory and autonomous-loop tools with strict schema validation and a full audit trail.</p></article>
+    <article class="card reveal"><i>🔎</i><h3>Hybrid RAG</h3><p>Dense semantic vectors + BM25/tsvector lexical search merged by Reciprocal Rank Fusion for precise context.</p></article>
+    <article class="card reveal"><i>👁</i><h3>CNN vision pipeline</h3><p>Denoise, contrast, Sobel conv-feature maps, adaptive threshold, ROI boxes and OCR on whiteboards and scans.</p></article>
+    <article class="card reveal"><i>⚡</i><h3>Groq ReAct agent</h3><p>Reason → call tools (in parallel) → observe → answer, running on Groq's ultra-fast Llama models.</p></article>
+    <article class="card reveal"><i>🛡</i><h3>Self-reflection guardrail</h3><p>A second model pass checks every answer for hallucinated details and timezone/schedule mistakes.</p></article>
+    <article class="card reveal"><i>🧠</i><h3>Agent memory</h3><p>Short-term, long-term and episodic memories recalled semantically across sessions.</p></article>
+    <article class="card reveal"><i>🌐</i><h3>3D context graph</h3><p>Notes, events and documents as an interactive Three.js constellation linked by similarity and tags.</p></article>
+    <article class="card reveal"><i>🐳</i><h3>Production backend</h3><p>TypeScript MCP server, Postgres + pgvector, Python CNN worker, all via Docker Compose.</p></article>
+  </div>
+</section>
+
+<section id="assistant" class="sec">
+  <h2 class="reveal">Assistant workspace</h2>
+  <p class="sub reveal">Everything below is live. Add a Groq key in Settings for the full agent; without one, chat falls back to local hybrid search.</p>
+  <div class="ws reveal">
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab on" data-tab="chat">💬 Chat</button><button class="tab" data-tab="notes">📝 Notes</button>
+      <button class="tab" data-tab="calendar">📅 Calendar</button><button class="tab" data-tab="vision">🖼 Vision</button>
+      <button class="tab" data-tab="memory">🧠 Memory</button><button class="tab" data-tab="audit">📜 Audit</button>
+    </div>
+
+    <div class="panel on" id="p-chat">
+      <div class="chips" id="chips"></div>
+      <div class="chat" id="chatLog" aria-live="polite"></div>
+      <form class="row" id="chatForm"><input id="chatInput" placeholder="Ask about your notes, calendar, scanned documents…" autocomplete="off" maxlength="2000"><button class="btn primary" id="chatSend">Send</button></form>
+    </div>
+
+    <div class="panel" id="p-notes">
+      <form class="stack" id="noteForm">
+        <input id="nTitle" placeholder="Title" required maxlength="200">
+        <textarea id="nContent" placeholder="Content…" rows="4" required maxlength="20000"></textarea>
+        <div class="row"><input id="nTags" placeholder="tags, comma separated"><button class="btn primary">Save note</button></div>
+      </form>
+      <div class="row"><input id="nSearch" placeholder="Hybrid search notes + documents…"></div>
+      <div id="noteList" class="list"></div>
+    </div>
+
+    <div class="panel" id="p-calendar">
+      <form class="stack" id="evForm">
+        <input id="eTitle" placeholder="Event title" required maxlength="200">
+        <div class="row"><label>Start<input type="datetime-local" id="eStart" required></label><label>End<input type="datetime-local" id="eEnd" required></label></div>
+        <div class="row"><input id="eLoc" placeholder="Location"><input id="eAtt" placeholder="Attendees (comma separated)"></div>
+        <textarea id="eDesc" rows="2" placeholder="Description"></textarea>
+        <div class="row"><button class="btn primary">Add event</button><button type="button" class="btn ghost" id="conflictBtn">Detect conflicts</button></div>
+      </form>
+      <div id="conflicts"></div><div id="evList" class="list"></div>
+    </div>
+
+    <div class="panel" id="p-vision">
+      <div class="stack">
+        <label class="drop" id="drop"><input type="file" id="imgFile" accept="image/*" hidden>📷 Drop or tap to choose a whiteboard / note / diagram image</label>
+        <canvas id="visCanvas" hidden></canvas>
+        <div class="row"><button class="btn primary" id="runVision" disabled>Run CNN + OCR</button><span id="visStatus" class="dim"></span></div>
+        <pre id="visText" class="out" hidden></pre><div id="visFeat" class="feat"></div>
+        <button class="btn ghost" id="saveVision" hidden>Save to knowledge base</button>
+      </div>
+      <div id="docList" class="list"></div>
+    </div>
+
+    <div class="panel" id="p-memory">
+      <form class="row" id="memForm"><input id="mFact" placeholder="Fact to remember…" required maxlength="1000">
+        <select id="mType"><option>long_term</option><option>episodic</option><option>short_term</option></select><button class="btn primary">Store</button></form>
+      <div id="memList" class="list"></div>
+    </div>
+
+    <div class="panel" id="p-audit"><div class="row"><button class="btn ghost" id="clearAudit">Clear</button><button class="btn ghost" id="exportBtn">Export data</button><button class="btn ghost" id="wipeBtn">Delete all data</button></div><div id="auditList" class="list"></div></div>
+  </div>
+</section>
+
+<section id="architecture" class="sec">
+  <h2 class="reveal">Architecture</h2>
+  <div class="arch reveal">
+    <svg viewBox="0 0 760 330" role="img" aria-label="Architecture diagram">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+      <g class="bx"><rect x="10" y="125" width="120" height="60" rx="10"/><text x="70" y="160">UI / Chat</text></g>
+      <g class="bx hi"><rect x="180" y="110" width="140" height="90" rx="10"/><text x="250" y="150">Groq ReAct</text><text x="250" y="170" class="s">+ reflection</text></g>
+      <g class="bx"><rect x="380" y="110" width="140" height="90" rx="10"/><text x="450" y="150">MCP Server</text><text x="450" y="170" class="s">12 tools · Zod</text></g>
+      <g class="bx"><rect x="580" y="20" width="160" height="70" rx="10"/><text x="660" y="52">Hybrid RAG</text><text x="660" y="72" class="s">pgvector + tsvector → RRF</text></g>
+      <g class="bx"><rect x="580" y="130" width="160" height="70" rx="10"/><text x="660" y="162">Calendar + Memory</text><text x="660" y="182" class="s">events · agent_memories</text></g>
+      <g class="bx"><rect x="580" y="240" width="160" height="70" rx="10"/><text x="660" y="272">CNN Vision</text><text x="660" y="292" class="s">denoise · conv · OCR</text></g>
+      <g stroke="#64748b" stroke-width="2" marker-end="url(#ar)" fill="none"><path d="M130 155H178"/><path d="M320 155H378"/><path d="M520 140L578 70"/><path d="M520 155H578"/><path d="M520 170L578 262"/></g>
+    </svg>
+  </div>
+</section>
+
+<section id="stack" class="sec">
+  <h2 class="reveal">Tech stack</h2>
+  <div class="chips big reveal">
+    <span>TypeScript</span><span>Node.js / Express</span><span>MCP SDK</span><span>Groq API</span><span>Llama 3.3 70B</span><span>PostgreSQL 16</span><span>pgvector (HNSW)</span><span>tsvector / pg_trgm</span><span>Reciprocal Rank Fusion</span><span>Python / FastAPI</span><span>OpenCV</span><span>Tesseract OCR</span><span>CNN feature maps</span><span>Zod</span><span>Next.js</span><span>Tailwind</span><span>Three.js</span><span>Docker Compose</span>
+  </div>
+</section>
+
+<section id="deploy" class="sec">
+  <h2 class="reveal">Deploy</h2>
+  <div class="grid two">
+    <div class="card reveal"><h3>Full stack (Docker)</h3>
+      <pre class="code"><code>cp .env.example .env   # add GROQ_API_KEY
+docker compose up --build</code></pre>
+      <p class="dim">Then open Settings → set “Backend API URL” to <code>http://localhost:4000</code> to route chat through the TypeScript MCP server and Postgres.</p></div>
+    <div class="card reveal"><h3>This site (GitHub Pages)</h3>
+      <pre class="code"><code>Repo → Settings → Pages
+Source: Deploy from a branch
+Branch: main  /docs</code></pre>
+      <p class="dim">It is pure static HTML/JS — no build step.</p></div>
+  </div>
+</section>
+
+<section id="faq" class="sec">
+  <h2 class="reveal">FAQ</h2>
+  <div class="faq reveal">
+    <details><summary>Where is my data stored?</summary><p>In this browser's localStorage only. Use Audit → Export data to back it up, or Delete all data to wipe it.</p></details>
+    <details><summary>Is my Groq key safe?</summary><p>It is kept in localStorage and sent only to api.groq.com. Anyone with access to your browser profile could read it, so use a restricted key and don't enter it on shared devices.</p></details>
+    <details><summary>Why does chat work without a key?</summary><p>Offline mode runs local hybrid search over your notes, documents and upcoming events. The full ReAct agent with tool calls needs a Groq key.</p></details>
+    <details><summary>How does the vision pipeline work in the browser?</summary><p>Canvas grayscale → contrast stretch → box-blur denoise → Sobel convolution + ReLU + pooling feature maps → adaptive threshold → Tesseract.js OCR with line regions. The Docker version uses OpenCV + Tesseract.</p></details>
+    <details><summary>Are embeddings truly semantic?</summary><p>The browser build uses hashed word/character n-gram vectors fused with BM25, which is strong on keywords and fuzzy matches but not deep semantics. Plug a real embedding model into the backend for that.</p></details>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="foot-grid">
+    <div><a class="brand" href="#top"><span class="logo">◈</span> MCP<span class="dim">Assistant</span></a>
+      <p class="dim">Agentic AI over your calendar, notes and documents — Groq · MCP · Hybrid RAG · CNN.</p></div>
+    <div><h4>Explore</h4><a href="#features">Features</a><a href="#assistant">Assistant</a><a href="#architecture">Architecture</a><a href="#deploy">Deploy</a></div>
+    <div><h4>Connect</h4><a href="https://github.com/Nikhil-creat" target="_blank" rel="noopener">GitHub</a><a href="https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a" target="_blank" rel="noopener">LinkedIn</a></div>
+    <div><h4>Built with</h4><p class="dim">TypeScript · Groq · MCP · pgvector · OpenCV · Three.js · Docker</p></div>
+  </div>
+  <div class="credit">Designed &amp; developed by <b>NIKHIL CHARY SRIRAMOJU</b> · B.Tech CSE, Vaagdevi College of Engineering</div>
+  <div class="dim copy">© <span id="yr"></span> Nikhil Chary Sriramoju · MIT License · Not affiliated with Groq or Anthropic</div>
+</footer>
+
+<dialog id="settings">
+  <form method="dialog" class="stack" id="setForm">
+    <h3>Settings</h3>
+    <label>Groq API key<input id="sKey" type="password" placeholder="gsk_…" autocomplete="off"></label>
+    <label>Model<select id="sModel"><option>llama-3.3-70b-versatile</option><option>llama-3.1-8b-instant</option><option>meta-llama/llama-4-scout-17b-16e-instruct</option></select></label>
+    <label>Timezone<input id="sTz" placeholder="Asia/Kolkata"></label>
+    <label>Backend API URL (optional)<input id="sApi" placeholder="http://localhost:4000"></label>
+    <div class="row"><button class="btn primary" value="save" id="sSave">Save</button><button class="btn ghost" value="cancel">Close</button></div>
+  </form>
+</dialog>
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

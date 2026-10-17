@@ -1,0 +1,15 @@
+FROM node:20-alpine AS build
+WORKDIR /ui
+COPY src/ui/package.json ./
+RUN npm install
+COPY src/ui ./
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+RUN npm run build
+
+FROM node:20-alpine
+WORKDIR /ui
+ENV NODE_ENV=production
+COPY --from=build /ui ./
+EXPOSE 3000
+CMD ["npm", "start"]
