@@ -52,3 +52,13 @@ dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--bd);border-r
 .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);background:#111a35;border:1px solid var(--ac);padding:9px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:.3s;z-index:99}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:820px){.burger{display:block}.nav nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:#05070dee;padding:14px 20px;gap:12px;border-bottom:1px solid var(--bd)}.nav nav.open{display:flex}.foot-grid{grid-template-columns:1fr 1fr}.badge{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+
+.byline{margin:.2em 0 0;color:var(--tx)}.byline b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.aigrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.aigrid .card{display:grid;gap:8px;align-content:start}.aigrid .card:hover{transform:none}.aigrid h3{margin:0}
+.vbar{margin-bottom:8px}.inl{display:flex;align-items:center;gap:6px;flex:none}.inl select{width:auto;padding:4px 8px}.inl input{width:auto}
+#micBtn.rec{border-color:var(--bad);animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 6px #f8717133}}
+.about{display:grid;grid-template-columns:minmax(240px,1fr) 2fr;gap:16px}.profile,.cred{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px}
+.profile{text-align:center}.profile h3{margin:.4em 0 0}.avatar{width:92px;height:92px;border-radius:50%;margin:0 auto;display:grid;place-items:center;font:700 2rem system-ui;color:#041018;background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 0 40px #38bdf855}
+.profile .cta{justify-content:center}.open{color:var(--ok);font-size:.85rem}.cred h4{margin:14px 0 8px}.cred h4:first-child{margin-top:0}
+.tl{border-left:2px solid var(--ac);padding:2px 0 2px 12px;margin:0 0 10px}.tl b{display:block}.tl span{color:var(--dim);font-size:.88rem}.credit small{color:var(--dim);letter-spacing:0}
+@media(max-width:820px){.about{grid-template-columns:1fr}}

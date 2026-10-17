@@ -8,6 +8,10 @@
 <meta name="author" content="Nikhil Chary Sriramoju">
 <meta name="theme-color" content="#05070d">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+<meta property="og:title" content="Personal MCP Assistant — by Nikhil Chary Sriramoju">
+<meta property="og:description" content="Agentic AI over your calendar, notes and documents: Groq, MCP, hybrid RAG, CNN vision.">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Nikhil Chary Sriramoju","url":"https://github.com/Nikhil-creat","sameAs":["https://github.com/Nikhil-creat","https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a"],"alumniOf":"Vaagdevi College of Engineering","jobTitle":"AI/ML & Data Engineering Intern"}</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,7 +19,7 @@
   <a class="brand" href="#top"><span class="logo">◈</span> MCP<span class="dim">Assistant</span></a>
   <nav id="menu">
     <a href="#features">Features</a><a href="#assistant">Assistant</a><a href="#architecture">Architecture</a>
-    <a href="#stack">Stack</a><a href="#deploy">Deploy</a><a href="#faq">FAQ</a>
+    <a href="#stack">Stack</a><a href="#about">About</a><a href="#deploy">Deploy</a><a href="#faq">FAQ</a>
   </nav>
   <div class="nav-actions">
     <span class="badge" id="modeBadge">offline mode</span>
@@ -29,6 +33,7 @@
   <canvas id="hero3d" aria-label="Interactive 3D context graph"></canvas>
   <div class="hero-copy reveal">
     <p class="eyebrow">Model Context Protocol · Groq LPU · Hybrid RAG · CNN Vision</p>
+    <p class="byline">by <b>Nikhil Chary Sriramoju</b> — AI/ML &amp; Data Engineering</p>
     <h1>Your calendar, notes & whiteboards — <span class="grad">one agentic brain.</span></h1>
     <p class="lead">A ReAct agent that searches your knowledge with dense + lexical retrieval, reads scanned images through a CNN/OCR pipeline, manages your schedule via MCP tools, and fact-checks itself before it answers.</p>
     <div class="cta">
@@ -56,6 +61,10 @@
     <article class="card reveal"><i>🧠</i><h3>Agent memory</h3><p>Short-term, long-term and episodic memories recalled semantically across sessions.</p></article>
     <article class="card reveal"><i>🌐</i><h3>3D context graph</h3><p>Notes, events and documents as an interactive Three.js constellation linked by similarity and tags.</p></article>
     <article class="card reveal"><i>🐳</i><h3>Production backend</h3><p>TypeScript MCP server, Postgres + pgvector, Python CNN worker, all via Docker Compose.</p></article>
+    <article class="card reveal"><i>☀</i><h3>Daily briefing &amp; planner</h3><p>AI-written briefings, conflict radar and a free-slot finder that books focus blocks for you.</p></article>
+    <article class="card reveal"><i>🎙</i><h3>Voice in English, తెలుగు, हिन्दी</h3><p>Talk to your assistant and hear answers back using the browser's speech engines.</p></article>
+    <article class="card reveal"><i>✨</i><h3>Note AI &amp; clustering</h3><p>Summaries, action items, flashcards, auto-tags and k-means topic clusters.</p></article>
+    <article class="card reveal"><i>🌍</i><h3>Multilingual agent</h3><p>Ask in your language — the agent replies in kind while staying grounded in your data.</p></article>
   </div>
 </section>
 
@@ -64,7 +73,7 @@
   <p class="sub reveal">Everything below is live. Add a Groq key in Settings for the full agent; without one, chat falls back to local hybrid search.</p>
   <div class="ws reveal">
     <div class="tabs" role="tablist" id="tabs">
-      <button class="tab on" data-tab="chat">💬 Chat</button><button class="tab" data-tab="notes">📝 Notes</button>
+      <button class="tab on" data-tab="chat">💬 Chat</button><button class="tab" data-tab="ai">✨ AI Tools</button><button class="tab" data-tab="notes">📝 Notes</button>
       <button class="tab" data-tab="calendar">📅 Calendar</button><button class="tab" data-tab="vision">🖼 Vision</button>
       <button class="tab" data-tab="memory">🧠 Memory</button><button class="tab" data-tab="audit">📜 Audit</button>
     </div>
@@ -72,7 +81,22 @@
     <div class="panel on" id="p-chat">
       <div class="chips" id="chips"></div>
       <div class="chat" id="chatLog" aria-live="polite"></div>
-      <form class="row" id="chatForm"><input id="chatInput" placeholder="Ask about your notes, calendar, scanned documents…" autocomplete="off" maxlength="2000"><button class="btn primary" id="chatSend">Send</button></form>
+      <div class="row vbar" id="voiceBar"><label class="inl">Voice <select id="voiceLang"><option value="en-IN">English</option><option value="te-IN">తెలుగు</option><option value="hi-IN">हिन्दी</option></select></label><label class="inl"><input type="checkbox" id="speakOn"> Speak answers</label></div>
+      <form class="row" id="chatForm"><input id="chatInput" placeholder="Ask about your notes, calendar, scanned documents…" autocomplete="off" maxlength="2000"><button type="button" class="btn ghost" id="micBtn" aria-label="Voice input">🎙</button><button class="btn primary" id="chatSend">Send</button></form>
+    </div>
+
+    <div class="panel" id="p-ai">
+      <div class="aigrid">
+        <div class="card"><h3>☀ Daily briefing</h3><p class="dim">Schedule, conflicts and top priorities from your data.</p><button class="btn primary" id="briefBtn">Generate briefing</button><div id="briefOut" class="list"></div></div>
+        <div class="card"><h3>🕒 Smart free-slot finder</h3>
+          <div class="row"><label>Days<input id="slotDays" type="number" min="1" max="14" value="3"></label><label>Minutes<input id="slotDur" type="number" min="15" step="15" value="60"></label></div>
+          <div class="row"><label>From (h)<input id="slotFrom" type="number" min="0" max="23" value="9"></label><label>To (h)<input id="slotTo" type="number" min="1" max="24" value="18"></label></div>
+          <input id="slotTitle" placeholder="Block title (e.g. Deep work)"><button class="btn primary" id="slotBtn">Find free time</button><div id="slotOut" class="list"></div></div>
+        <div class="card"><h3>📝 Note AI</h3><select id="aiNote"></select>
+          <select id="aiAction"><option value="summarize">Summarise</option><option value="actions">Extract action items</option><option value="flashcards">Make flashcards</option><option value="explain">Explain simply</option><option value="rewrite">Rewrite professionally</option><option value="tags">Auto-tag (offline)</option></select>
+          <button class="btn primary" id="aiRun">Run</button><div id="aiOut" class="list"></div></div>
+        <div class="card"><h3>🧩 Topic clusters</h3><p class="dim">Offline k-means over note embeddings.</p><div class="row"><label>Clusters<input id="clusterK" type="number" min="2" max="8" value="4"></label><button class="btn primary" id="clusterBtn">Cluster notes</button></div><div id="clusterOut" class="list"></div></div>
+      </div>
     </div>
 
     <div class="panel" id="p-notes">
@@ -140,6 +164,40 @@
   </div>
 </section>
 
+<section id="about" class="sec">
+  <h2 class="reveal">About the developer</h2>
+  <div class="about reveal">
+    <div class="profile">
+      <div class="avatar">NC</div>
+      <h3>Nikhil Chary Sriramoju</h3>
+      <p class="dim">AI/ML &amp; Data Engineering · Agentic AI builder</p>
+      <p class="dim">📍 Thorrur, Telangana, India</p>
+      <div class="cta"><a class="btn primary" href="https://github.com/Nikhil-creat" target="_blank" rel="noopener">GitHub</a><a class="btn ghost" href="https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a" target="_blank" rel="noopener">LinkedIn</a><a class="btn ghost" href="mailto:sriramojunikhil66@gmail.com">Email</a></div>
+      <p class="open">● Open to collaboration &amp; opportunities</p>
+    </div>
+    <div class="cred">
+      <h4>🎓 Education</h4>
+      <div class="tl"><b>B.Tech, Computer Science &amp; Engineering</b><span>Vaagdevi College of Engineering · 2023 – 2027 (final year)</span></div>
+      <h4>💼 Experience</h4>
+      <div class="tl"><b>Machine Learning Engineer Intern</b><span>Yuva Intern (NSDC) · Aug – Sep 2026</span></div>
+      <div class="tl"><b>Data Analytics Intern</b><span>Thiranex · Jul – Aug 2026</span></div>
+      <h4>🏅 Certifications</h4>
+      <div class="chips"><span>NASSCOM · Skill India Digital Hub — AI-Data Engineering &amp; Cloud Infrastructure Analyst</span><span>IBM SkillsBuild — AI Fundamentals</span><span>Reliance Foundation — AI/ML Engineer Foundation</span></div>
+      <h4>🛠 Core skills</h4>
+      <div class="chips"><span>Agentic AI</span><span>RAG</span><span>LLMs &amp; LoRA</span><span>Computer Vision / CNN</span><span>MCP</span><span>LangGraph</span><span>FastAPI</span><span>TypeScript</span><span>Next.js</span><span>PostgreSQL / pgvector</span><span>Docker</span><span>Data Engineering</span></div>
+    </div>
+  </div>
+  <h3 class="reveal" style="margin-top:28px">Selected projects</h3>
+  <div class="grid cards">
+    <article class="card reveal"><h3>AetherNexus-Quantum</h3><p>3D spatial digital twin with ViT/CNN vision, Graph-RAG and an agent swarm.</p></article>
+    <article class="card reveal"><h3>VisionMesh AI</h3><p>Visual diagnostics platform: CNN vision, LangGraph agents, hybrid RAG + Neo4j.</p></article>
+    <article class="card reveal"><h3>ModelRoute Enterprise</h3><p>Multimodal distillation, QLoRA and CNN-based model routing.</p></article>
+    <article class="card reveal"><h3>Go AI Gateway</h3><p>Low-latency Go gateway with MCP, semantic cache and rate limiting.</p></article>
+    <article class="card reveal"><h3>LoRA Forge</h3><p>LoRA fine-tuning pipeline for Llama 3 8B / Mistral 7B.</p></article>
+    <article class="card reveal"><h3>OmniLingua AI</h3><p>Agentic translation app with RAG glossary, OCR and voice.</p></article>
+  </div>
+</section>
+
 <section id="deploy" class="sec">
   <h2 class="reveal">Deploy</h2>
   <div class="grid two">
@@ -171,11 +229,11 @@ Branch: main  /docs</code></pre>
   <div class="foot-grid">
     <div><a class="brand" href="#top"><span class="logo">◈</span> MCP<span class="dim">Assistant</span></a>
       <p class="dim">Agentic AI over your calendar, notes and documents — Groq · MCP · Hybrid RAG · CNN.</p></div>
-    <div><h4>Explore</h4><a href="#features">Features</a><a href="#assistant">Assistant</a><a href="#architecture">Architecture</a><a href="#deploy">Deploy</a></div>
+    <div><h4>Explore</h4><a href="#features">Features</a><a href="#assistant">Assistant</a><a href="#architecture">Architecture</a><a href="#about">About</a><a href="#deploy">Deploy</a></div>
     <div><h4>Connect</h4><a href="https://github.com/Nikhil-creat" target="_blank" rel="noopener">GitHub</a><a href="https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a" target="_blank" rel="noopener">LinkedIn</a></div>
     <div><h4>Built with</h4><p class="dim">TypeScript · Groq · MCP · pgvector · OpenCV · Three.js · Docker</p></div>
   </div>
-  <div class="credit">Designed &amp; developed by <b>NIKHIL CHARY SRIRAMOJU</b> · B.Tech CSE, Vaagdevi College of Engineering</div>
+  <div class="credit">Designed &amp; developed by <b>NIKHIL CHARY SRIRAMOJU</b> · B.Tech CSE, Vaagdevi College of Engineering<br><small>ML Engineer Intern @ Yuva Intern (NSDC) · Data Analytics Intern @ Thiranex · NASSCOM · IBM SkillsBuild · Reliance Foundation</small></div>
   <div class="dim copy">© <span id="yr"></span> Nikhil Chary Sriramoju · MIT License · Not affiliated with Groq or Anthropic</div>
 </footer>
 

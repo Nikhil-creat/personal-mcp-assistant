@@ -18,7 +18,7 @@ export async function groqComplete(system, user, json = false) {
 const sys = () => `You are a personal assistant with tools for the user's calendar, notes, scanned documents and memory.
 Current time: ${nowInfo()}. Always pass ISO-8601 timestamps WITH the user's UTC offset (${tzOffset(settings().tz)}).
 Work in a ReAct loop: think, call tools, read results, repeat. Search notes AND vision documents with hybrid_search_notes before answering from knowledge.
-Never invent notes, events or times. If tools return nothing, say so plainly. Be concise.`;
+Never invent notes, events or times. If tools return nothing, say so plainly. Be concise. Reply in the same language the user writes in (English, Telugu, Hindi, etc.).`;
 
 const history = [];
 export function resetHistory() { history.length = 0; }

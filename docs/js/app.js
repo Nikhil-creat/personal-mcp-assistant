@@ -4,6 +4,7 @@ import { callTool, searchItems } from "./tools.js";
 import { chat } from "./agent.js";
 import { loadToCanvas, runVision, drawGrid } from "./vision.js";
 import { initGraph } from "./graph3d.js";
+import { initAI, speak } from "./ai.js";
 
 const $ = (s) => document.querySelector(s);
 const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2600); };
@@ -55,7 +56,7 @@ $("#chatForm").onsubmit = async (e) => { e.preventDefault(); const q = $("#chatI
   $("#chatInput").value = ""; add("u", esc(q)); const w = add("", "thinking…"); $("#chatSend").disabled = true; const t0 = performance.now();
   try { const r = await chat(q, (s) => (w.innerHTML = `running <b>${esc(s.tool)}</b>…`));
     const meta = (r.steps?.length ? r.steps.map((s) => `${s.tool} ${s.ms}ms`).join(" → ") + " · " : "") + `${Math.round(performance.now() - t0)}ms` + (r.reflection ? ` · grounded: ${r.reflection.grounded}` : "");
-    w.innerHTML = md(r.answer) + `<small>${esc(meta)}</small>`;
+    w.innerHTML = md(r.answer) + `<small>${esc(meta)}</small>`; if ($("#speakOn")?.checked) speak(r.answer);
   } catch (err) { w.innerHTML = "⚠ " + esc(err.message); }
   $("#chatSend").disabled = false; log.scrollTop = log.scrollHeight; };
 
@@ -110,4 +111,4 @@ $("#wipeBtn").onclick = () => { if (confirm("Delete ALL local notes, events, doc
 
 function renderAll() { renderNotes(); renderEvents(); renderDocs(); renderMem(); renderAudit(); }
 document.addEventListener("datachanged", renderAll); renderAll();
-initGraph($("#hero3d"));
+initGraph($("#hero3d")); initAI();
